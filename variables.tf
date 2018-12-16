@@ -18,8 +18,6 @@ variable "aws_region" {
 }
 
 # Personalization variables
-variable "whitelist" {}
-
 variable "bastion_whitelist" {}
 
 variable "bastion_username" {
@@ -49,16 +47,4 @@ variable "instance_type" {
 
 variable "ami" {
   default = "ami-cfe4b2b0"
-}
-
-variable "nifi_base_dir" {
-  default = "/opt/nifi"
-}
-
-variable "nifi_gid" {
-  default = "1000"
-}
-
-variable "nifi_uid" {
-  default = "1000"
 }
