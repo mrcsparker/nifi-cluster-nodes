@@ -99,3 +99,40 @@ resource "aws_route53_record" "nifi" {
 
   records = ["${element(aws_instance.nifi_node.*.private_ip, count.index)}"]
 }
+
+# Create the policies to allow EC2 to join ECS cluster
+resource "aws_iam_role" "ecs_instance_role" {
+  name = "${var.name}_ecs_instance_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": ["ec2.amazonaws.com"]
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "ecs" {
+  name = "${var.name}_ecs_instance_profile"
+  path = "/"
+  role = "${aws_iam_role.ecs_instance_role.name}"
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ec2_role" {
+  role       = "${aws_iam_role.ecs_instance_role.id}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+# TODO, may not be necessary
+resource "aws_iam_role_policy_attachment" "ecs_ec2_cloudwatch_role" {
+  role       = "${aws_iam_role.ecs_instance_role.id}"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
