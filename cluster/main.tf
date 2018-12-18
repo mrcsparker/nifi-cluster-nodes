@@ -4,6 +4,7 @@ resource "aws_instance" "nifi_node" {
   count                  = "${var.node_count}"
   vpc_security_group_ids = ["${var.security_group_ids}"]
   user_data              = "${data.template_file.user_data.rendered}"
+  iam_instance_profile   = "${aws_iam_instance_profile.ecs.id}"
   subnet_id              = "${element(var.subnet_ids, count.index%var.node_count)}"
   key_name               = "${var.aws_keypair}"
 
